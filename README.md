@@ -14,7 +14,7 @@ If you want to know more about CX, please refer the original [paper](https://arx
 
 ## Installation
 ```
-pip install git+https://github.com/S-aiueo32/contextual_loss_pytorch.git
+pip install git+https://github.com/ttaa9/contextual_loss_pytorch.git
 ```
 
 ## Usage
