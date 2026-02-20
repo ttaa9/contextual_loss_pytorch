@@ -38,6 +38,8 @@ class ContextualBilateralLoss(nn.Module):
             f'select a loss type from {LOSS_TYPES}.'
 
         self.band_width = band_width
+        self.loss_type = loss_type
+        self.weight_sp = weight_sp
 
         if use_vgg:
             self.vgg_model = VGG19()
@@ -66,4 +68,4 @@ class ContextualBilateralLoss(nn.Module):
             x = getattr(self.vgg_model(x), self.vgg_layer)
             y = getattr(self.vgg_model(y), self.vgg_layer)
 
-        return F.contextual_bilateral_loss(x, y, self.band_width)
+        return F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type)
