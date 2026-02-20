@@ -171,13 +171,12 @@ def compute_l2_distance(x, y):
     N, C, H, W = x.size()
     x_vec = x.view(N, C, -1)
     y_vec = y.view(N, C, -1)
-    x_s = torch.sum(x_vec ** 2, dim=1)
-    y_s = torch.sum(y_vec ** 2, dim=1)
-
-    A = y_vec.transpose(1, 2) @ x_vec
-    #dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(0, 1)
-    #dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(1, 2)
-    dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(0, 1)
+    x_s = torch.sum(x_vec ** 2, dim=1, keepdim=True) # B x 1 x HW
+    y_s = torch.sum(y_vec ** 2, dim=1, keepdim=True)
+    A = y_vec.transpose(1, 2) @ x_vec # B x HW x C @ B x C x HW -> B x HW x HW
+    #print(x.shape, y_s.shape, A.shape, x_s.shape)
+    # (B x 1 x HW) - (B x HW x HW) + B x HW x 1
+    dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(1, 2)
     dist = dist.transpose(1, 2).reshape(N, H*W, H*W)
     dist = dist.clamp(min=0.)
 
