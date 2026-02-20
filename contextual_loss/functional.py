@@ -176,7 +176,8 @@ def compute_l2_distance(x, y):
 
     A = y_vec.transpose(1, 2) @ x_vec
     #dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(0, 1)
-    dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(1, 2)
+    #dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(1, 2)
+    dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(0, 1)
     dist = dist.transpose(1, 2).reshape(N, H*W, H*W)
     dist = dist.clamp(min=0.)
 
