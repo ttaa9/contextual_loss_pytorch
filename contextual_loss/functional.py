@@ -159,7 +159,7 @@ def compute_l1_distance(x: torch.Tensor, y: torch.Tensor):
     y_vec = y.view(N, C, -1)
 
     dist = x_vec.unsqueeze(2) - y_vec.unsqueeze(3)
-    dist = dist.sum(dim=1).abs()
+    dist = dist.abs().sum(dim=1)
     dist = dist.transpose(1, 2).reshape(N, H*W, H*W)
     dist = dist.clamp(min=0.)
 
@@ -175,7 +175,8 @@ def compute_l2_distance(x, y):
     y_s = torch.sum(y_vec ** 2, dim=1)
 
     A = y_vec.transpose(1, 2) @ x_vec
-    dist = y_s - 2 * A + x_s.transpose(0, 1)
+    #dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(0, 1)
+    dist = y_s - 2 * A.transpose(1, 2) + x_s.transpose(1, 2)
     dist = dist.transpose(1, 2).reshape(N, H*W, H*W)
     dist = dist.clamp(min=0.)
 
