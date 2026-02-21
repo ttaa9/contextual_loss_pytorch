@@ -59,7 +59,9 @@ def contextual_bilateral_loss(x: torch.Tensor,
                               y: torch.Tensor,
                               weight_sp: float = 0.1,
                               band_width: float = 0.5,
-                              loss_type: str = 'cosine'):
+                              loss_type: str = 'cosine',
+                              eps: float = 1e-6,
+                             ):
     """
     Computes Contextual Bilateral (CoBi) Loss between x and y,
         proposed in https://arxiv.org/pdf/1905.05169.pdf.
@@ -96,7 +98,7 @@ def contextual_bilateral_loss(x: torch.Tensor,
 
     # feature loss
     if loss_type == 'cosine':
-        dist_raw = compute_cosine_distance(x, y)
+        dist_raw = compute_cosine_distance(x, y, eps=eps)
     elif loss_type == 'l1':
         dist_raw = compute_l1_distance(x, y)
     elif loss_type == 'l2':
@@ -127,15 +129,15 @@ def compute_relative_distance(dist_raw):
     return dist_tilde
 
 
-def compute_cosine_distance(x, y):
+def compute_cosine_distance(x, y, eps=1e-6):
     # mean shifting by channel-wise mean of `y`.
     y_mu = y.mean(dim=(0, 2, 3), keepdim=True)
     x_centered = x - y_mu
     y_centered = y - y_mu
 
     # L2 normalization
-    x_normalized = F.normalize(x_centered, p=2, dim=1)
-    y_normalized = F.normalize(y_centered, p=2, dim=1)
+    x_normalized = F.normalize(x_centered, p=2, dim=1, eps=eps)
+    y_normalized = F.normalize(y_centered, p=2, dim=1, eps=eps)
 
     # channel-wise vectorization
     N, C, *_ = x.size()
