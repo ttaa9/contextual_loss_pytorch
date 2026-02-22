@@ -129,11 +129,15 @@ def compute_relative_distance(dist_raw):
     return dist_tilde
 
 
-def compute_cosine_distance(x, y, eps=1e-6):
-    # mean shifting by channel-wise mean of `y`.
-    y_mu = y.mean(dim=(0, 2, 3), keepdim=True)
-    x_centered = x - y_mu
-    y_centered = y - y_mu
+def compute_cosine_distance(x, y, eps=1e-6, use_mean_shift=False):
+    if use_mean_shift:
+      # mean shifting by channel-wise mean of `y`.
+      y_mu = y.mean(dim=(0, 2, 3), keepdim=True)
+      x_centered = x - y_mu
+      y_centered = y - y_mu
+    else:
+      x_centered = x 
+      y_centered = y 
 
     # L2 normalization
     x_normalized = F.normalize(x_centered, p=2, dim=1, eps=eps)
