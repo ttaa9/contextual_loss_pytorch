@@ -29,6 +29,7 @@ class ContextualBilateralLoss(nn.Module):
                  band_width: float = 0.5,
                  loss_type: str = 'cosine',
                  use_vgg: bool = False,
+                 eps: float = 1e-6,
                  vgg_layer: str = 'relu3_4'):
 
         super(ContextualBilateralLoss, self).__init__()
@@ -40,6 +41,7 @@ class ContextualBilateralLoss(nn.Module):
         self.band_width = band_width
         self.loss_type = loss_type
         self.weight_sp = weight_sp
+        self.eps = eps
 
         if use_vgg:
             self.vgg_model = VGG19()
@@ -68,4 +70,4 @@ class ContextualBilateralLoss(nn.Module):
             x = getattr(self.vgg_model(x), self.vgg_layer)
             y = getattr(self.vgg_model(y), self.vgg_layer)
 
-        return F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type)
+        return F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
