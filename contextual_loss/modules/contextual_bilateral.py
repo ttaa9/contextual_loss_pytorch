@@ -58,7 +58,7 @@ class ContextualBilateralLoss(nn.Module):
                     [[[0.229]], [[0.224]], [[0.225]]], requires_grad=False)
             )
 
-    def forward(self, x, y):
+    def forward(self, x, y, ret_intermeds=False):
         if hasattr(self, 'vgg_model'):
             assert x.shape[1] == 3 and y.shape[1] == 3,\
                 'VGG model takes 3 chennel images.'
@@ -72,9 +72,14 @@ class ContextualBilateralLoss(nn.Module):
             vy = self.vgg_model(y)
             xs = [ getattr(vx, self.vgg_layer[i]) for i in range(len(self.vgg_layer)) ]
             ys = [ getattr(vy, self.vgg_layer[i]) for i in range(len(self.vgg_layer)) ]
-            T = 0.0
+            Ts = []
             for j,(x,y) in enumerate(zip(xs,ys)):
-                T += F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
+                T.append( 
+                    F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
+                )
+            T = sum(Ts)
+            if return_intermeds:
+                return T, { 'vx': vx, 'vy': vy, 'xs': xs, 'ys': ys, 'Ts': Ts, }
             return T
 
         return F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
