@@ -74,7 +74,7 @@ class ContextualBilateralLoss(nn.Module):
             ys = [ getattr(vy, self.vgg_layer[i]) for i in range(len(self.vgg_layer)) ]
             Ts = []
             for j,(x,y) in enumerate(zip(xs,ys)):
-                T.append( 
+                Ts.append( 
                     F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
                 )
             T = torch.stack(Ts).mean()
