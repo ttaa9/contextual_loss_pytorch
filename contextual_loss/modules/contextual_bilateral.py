@@ -78,7 +78,7 @@ class ContextualBilateralLoss(nn.Module):
                     F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
                 )
             T = torch.stack(Ts).mean()
-            if return_intermeds:
+            if ret_intermeds:
                 return T, { 'vx': vx, 'vy': vy, 'xs': xs, 'ys': ys, 'Ts': Ts, }
             return T
 
