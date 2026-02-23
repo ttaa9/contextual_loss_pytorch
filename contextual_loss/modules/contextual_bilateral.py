@@ -30,7 +30,7 @@ class ContextualBilateralLoss(nn.Module):
                  loss_type: str = 'cosine',
                  use_vgg: bool = False,
                  eps: float = 1e-6,
-                 vgg_layer: str = 'relu3_4'):
+                 vgg_layer: list = ['relu1_2', 'relu2_2', 'relu3_4']):
 
         super(ContextualBilateralLoss, self).__init__()
 
@@ -42,6 +42,7 @@ class ContextualBilateralLoss(nn.Module):
         self.loss_type = loss_type
         self.weight_sp = weight_sp
         self.eps = eps
+        self.use_vgg = use_vgg
 
         if use_vgg:
             self.vgg_model = VGG19()
@@ -67,7 +68,13 @@ class ContextualBilateralLoss(nn.Module):
             y = y.sub(self.vgg_mean.detach()).div(self.vgg_std.detach())
 
             # picking up vgg feature maps
-            x = getattr(self.vgg_model(x), self.vgg_layer)
-            y = getattr(self.vgg_model(y), self.vgg_layer)
+            vx = self.vgg_model(x)
+            vy = self.vgg_model(y)
+            xs = [ getattr(vx, self.vgg_layer[i]) for i in range(len(self.vgg_layer)) ]
+            ys = [ getattr(vy, self.vgg_layer[i]) for i in range(len(self.vgg_layer)) ]
+            T = 0.0
+            for j,(x,y) in enumerate(zip(xs,ys)):
+                T += F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
+            return T
 
         return F.contextual_bilateral_loss(x, y, weight_sp = self.weight_sp, band_width = self.band_width, loss_type = self.loss_type, eps = self.eps)
